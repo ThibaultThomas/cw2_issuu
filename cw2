@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import pandas as pd
 import json
 import re
@@ -73,9 +75,16 @@ def main():
         p.showContinent(args.uuid)
 
     elif task == "3a":
-        p.showCountries(args.uuid)
+        p.viewPerUserAgent()
     elif task == "3b":
-        p.showCountries(args.uuid)
+        p.viewPerBrowser()
+    elif task == "4d":
+        p.viewPerBrowser()
+    elif task == "5":
+        p.viewPerBrowser()
+    elif task == "6":
+        p.viewPerBrowser()
+
     else:
         print("Error: Task not in range [2a, 2b, 3a, 3b, 4d, 5, 6]")
 

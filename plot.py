@@ -13,6 +13,7 @@ class plot:
                 values[k] = 1
             else:
                 values[k] += 1
+        plt.figure()
         plt.style.use('ggplot')
 
         x = values.keys()
@@ -30,23 +31,24 @@ class plot:
 
     def showCountries(self, docid):
         countries = self.dataframe[self.dataframe.subject_doc_id == docid]
-        #print(countries.head())
-        print(self.dataframe)
         c = countries["visitor_country"]
         self.showPlot(c, "Country", "Occurrences", "Number of occurrences per country")
 
 
     def showContinent(self, docid):
         countries = self.dataframe[self.dataframe.subject_doc_id == docid]
-        #print(countries.head())
         c = countries["continent"]
         self.showPlot(c, "Continent", "Occurrences", "Number of occurrences per Continent")
 
     def viewPerBrowser(self):
         c = self.dataframe["browser"]
-        z = self.dataframe["visitor_useragent"]
 
         self.showPlot(c, "Browser", "Occurrences", "Number of occurrences per browser")
+
+    def viewPerUserAgent(self):
+        z = self.dataframe["visitor_useragent"]
+
+        self.showPlot(z, "User-agent", "Occurrences", "Number of useragent")
 
     def getViewersOfDocument(self, docid):
         docs = self.dataframe[self.dataframe.subject_doc_id == docid]
@@ -62,7 +64,6 @@ class plot:
         docs = self.getViewersOfDocument(docid)
         array = []
         for z in docs:
-            print(z)
             if visitorid is None or visitorid != z:
                 for k in self.getDocumentsSeen(z):
                     if k != docid:
