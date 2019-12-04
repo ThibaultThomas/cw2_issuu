@@ -57,7 +57,7 @@ class plot:
 
     def getDocumentsSeen(self, visitor_uuid):
         ids = self.dataframe[self.dataframe.visitor_uuid == visitor_uuid]
-        docs = ids["subject_doc_id"]
+        docs = ids["subject_doc_id"].dropna().unique()
         return list(docs)
 
     def alsoLikedDocuments(self, docid, visitorid):
@@ -65,16 +65,18 @@ class plot:
         array = []
         for z in docs:
             if visitorid is None or visitorid != z:
+                print(z)
                 for k in self.getDocumentsSeen(z):
-                    if k != docid:
+                     if k != docid:
                         array.append(k)
 
-
+        print(array)
         return array
 
     def topTenDocumentsSeen(self, docid, visitorid):
         array = self.alsoLikedDocuments(docid, visitorid)
         new_list = sorted(array, key=array.count, reverse=True)
-        if len(new_list) > 10:
-            return new_list[:10]
-        return new_list
+        new_set = set(new_list)
+        if len(new_set) > 10:
+            return list(new_set)[:10]
+        return list(new_set)

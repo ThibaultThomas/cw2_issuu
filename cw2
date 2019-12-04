@@ -67,11 +67,13 @@ def main():
             print("Missing uuid argument")
             exit(1)
 
+        # Show the graph of countries using matplotlib
         p.showCountries(args.uuid)
     elif task == "2b":
         if args.uuid is None:
             print("Missing uuid argument")
             exit(1)
+        # Show the graph of continents using matplotlib
         p.showContinent(args.uuid)
 
     elif task == "3a":
@@ -79,7 +81,22 @@ def main():
     elif task == "3b":
         p.viewPerBrowser()
     elif task == "4d":
-        p.viewPerBrowser()
+        if args.document is None:
+            print("Missing document argument")
+            exit(1)
+
+        # Getting the top 10 files that this user may likes
+        # The uuid remove the user from the list
+        list = p.topTenDocumentsSeen(args.document, args.uuid)
+
+        # Check if documents has been found
+        if list is None or len(list) == 0:
+            print("No documents has been found")
+        else:
+            print("Here the top 10 documents this user may like")
+            for i in range (len(list)):
+                print("{0}: {1}".format(i + 1, list[i]))
+
     elif task == "5":
         p.viewPerBrowser()
     elif task == "6":
