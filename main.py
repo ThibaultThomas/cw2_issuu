@@ -1,7 +1,8 @@
 import pandas as pd
 import json
 import re
-
+import argparse
+import os
 
 from continent import countryToContient
 from plot import plot
@@ -25,21 +26,58 @@ def readFile(path):
 
     return array
 
+
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_colwidth', -1)
 pd.set_option('display.expand_frame_repr', False)
 
-lines = readFile("issuu_cw2.json")
-df = pd.DataFrame.from_dict(lines)
-k = df.subject_doc_id.unique()
+#lines = readFile("sample_100k_lines.json")
+#df = pd.DataFrame.from_dict(lines)
+#k = df.subject_doc_id.unique()
 
-#for z in k:
-    #print(z)
+
+# for z in k:
+# print(z)
 #    if len(plot(df).getViewersOfDocument(z)) > 1:
 #        print(z)
 #        print(len(plot(df).getViewersOfDocument(z)))
 
-#print(df)
+# print(plot(df).topTenDocumentsSeen("140228101942-d4c9bd33cc299cc53d584ca1a4bf15d9", "2f63e0cca690da91"))
 
-plot(df).topTenDocumentsSeen("140228101942-d4c9bd33cc299cc53d584ca1a4bf15d9", "6a5259b04ccc2fa1")
+
+def main():
+
+    parser = argparse.ArgumentParser(description="Issuu CW2")
+    parser.add_argument("-f", "--file", help="JSON file with data", required=True)
+    parser.add_argument("-u", "--uuid", help="User uuid")
+    parser.add_argument("-d", "--document", help="The document id")
+    parser.add_argument("-t", "--task", help="The task of the coursework", required=True)
+    args = parser.parse_args()
+
+    task = args.task
+    lines = readFile(args.file)
+    df = pd.DataFrame.from_dict(lines)
+    p = plot(df)
+
+    if task == "2a":
+        if args.uuid is None:
+            print("Missing uuid argument")
+            exit(1)
+
+        p.showCountries(args.uuid)
+    elif task == "2b":
+        if args.uuid is None:
+            print("Missing uuid argument")
+            exit(1)
+        p.showContinent(args.uuid)
+
+    elif task == "3a":
+        p.showCountries(args.uuid)
+    elif task == "3b":
+        p.showCountries(args.uuid)
+    else:
+        print("Error: Task not in range [2a, 2b, 3a, 3b, 4d, 5, 6]")
+
+
+main()

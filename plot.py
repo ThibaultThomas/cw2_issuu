@@ -73,11 +73,7 @@ class plot:
 
     def topTenDocumentsSeen(self, docid, visitorid):
         array = self.alsoLikedDocuments(docid, visitorid)
-        map = {}
-        for c in array:
-            if c not in map:
-                map[c] = 1
-            else:
-                map[c] += 1
-
-        print(map)
+        new_list = sorted(array, key=array.count, reverse=True)
+        if len(new_list) > 10:
+            return new_list[:10]
+        return new_list
