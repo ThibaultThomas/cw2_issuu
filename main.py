@@ -19,7 +19,6 @@ def readFile(path):
             s = re.sub(r'\(.*?\)', '', j["visitor_useragent"])
             splited = s.split(' ')
             if len(splited) > 5 and len(splited[5].split('/')) > 1:
-                print(s)
                 j["browser"] = splited[5].split('/')[0]
             array.append(j)
             line = fp.readline()
@@ -33,6 +32,14 @@ pd.set_option('display.expand_frame_repr', False)
 
 lines = readFile("issuu_cw2.json")
 df = pd.DataFrame.from_dict(lines)
-print(df.head())
+k = df.subject_doc_id.unique()
 
-plot(df).viewPerBrowser()
+#for z in k:
+    #print(z)
+#    if len(plot(df).getViewersOfDocument(z)) > 1:
+#        print(z)
+#        print(len(plot(df).getViewersOfDocument(z)))
+
+#print(df)
+
+plot(df).topTenDocumentsSeen("140228101942-d4c9bd33cc299cc53d584ca1a4bf15d9", "6a5259b04ccc2fa1")

@@ -39,7 +39,6 @@ class plot:
     def showContinent(self, docid):
         countries = self.dataframe[self.dataframe.subject_doc_id == docid]
         #print(countries.head())
-        print(self.dataframe)
         c = countries["continent"]
         self.showPlot(c, "Continent", "Occurrences", "Number of occurrences per Continent")
 
@@ -51,13 +50,34 @@ class plot:
 
     def getViewersOfDocument(self, docid):
         docs = self.dataframe[self.dataframe.subject_doc_id == docid]
-        ids = docs["visitor_uuid"]
-        return ids
+        ids = docs["visitor_uuid"].dropna().unique()
+        return list(ids)
 
     def getDocumentsSeen(self, visitor_uuid):
         ids = self.dataframe[self.dataframe.visitor_uuid == visitor_uuid]
         docs = ids["subject_doc_id"]
-        return docs
+        return list(docs)
 
     def alsoLikedDocuments(self, docid, visitorid):
-        return None
+        docs = self.getViewersOfDocument(docid)
+        array = []
+        for z in docs:
+            print(z)
+            if visitorid is None or visitorid != z:
+                for k in self.getDocumentsSeen(z):
+                    if k != docid:
+                        array.append(k)
+
+
+        return array
+
+    def topTenDocumentsSeen(self, docid, visitorid):
+        array = self.alsoLikedDocuments(docid, visitorid)
+        map = {}
+        for c in array:
+            if c not in map:
+                map[c] = 1
+            else:
+                map[c] += 1
+
+        print(map)
