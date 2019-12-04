@@ -65,12 +65,10 @@ class plot:
         array = []
         for z in docs:
             if visitorid is None or visitorid != z:
-                print(z)
                 for k in self.getDocumentsSeen(z):
                      if k != docid:
                         array.append(k)
 
-        print(array)
         return array
 
     def topTenDocumentsSeen(self, docid, visitorid):
