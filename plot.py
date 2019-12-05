@@ -62,14 +62,20 @@ class plot:
 
     def alsoLikedDocuments(self, docid, visitorid):
         docs = self.getViewersOfDocument(docid)
+        print(docs)
         array = []
         for z in docs:
             if visitorid is None or visitorid != z:
                 for k in self.getDocumentsSeen(z):
-                     if k != docid:
+                    if k != docid:
                         array.append(k)
-
         return array
+
+    def userHasReadDocument(self, docid, uuid):
+        if uuid is None:
+            return False
+        viewers = self.getViewersOfDocument(docid)
+        return uuid in viewers
 
     def topTenDocumentsSeen(self, docid, visitorid):
         array = self.alsoLikedDocuments(docid, visitorid)
@@ -78,3 +84,18 @@ class plot:
         if len(new_set) > 10:
             return list(new_set)[:10]
         return list(new_set)
+
+    def topTenDocumentsWithAuthor(self, docid, visitorid):
+        array = self.topTenDocumentsSeen(docid, visitorid)
+        viewer = self.getViewersOfDocument(docid)
+        mp = {}
+        for doc in array:
+            viewers = self.getViewersOfDocument(doc)
+            for u in set(viewers):
+                if u in viewer:
+                    if doc in mp:
+                        mp[doc].append(u)
+                    else:
+                        mp[doc] = []
+                        mp[doc].append(u)
+        return mp

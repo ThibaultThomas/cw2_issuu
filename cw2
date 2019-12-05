@@ -7,6 +7,7 @@ import argparse
 import os
 
 from continent import countryToContient
+from graph import Graph
 from plot import plot
 
 
@@ -98,7 +99,14 @@ def main():
                 print("{0}: {1}".format(i + 1, list[i]))
 
     elif task == "5":
-        p.viewPerBrowser()
+
+        if args.document is None:
+            print("Missing document argument")
+            exit(1)
+        if args.uuid is None:
+            Graph(p, uuid=None, document=args.document)
+        else:
+            Graph(p, uuid=args.uuid, document=args.document)
     elif task == "6":
         p.viewPerBrowser()
 
