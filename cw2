@@ -4,6 +4,7 @@ import argparse
 
 from data_analyzer import DataAnalyzer
 from graph import Graph
+from gui import GUI
 from histogram import *
 
 
@@ -93,7 +94,7 @@ def main():
             Graph(p, uuid=args.uuid, document=args.document)
 
     elif task == "6":
-        print("Not implemented yet")
+        GUI().openGui()
 
     else:
         print("Error: Task not in range [2a, 2b, 3a, 3b, 4d, 5, 6]")
