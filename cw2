@@ -4,26 +4,36 @@ import pandas as pd
 import json
 import re
 import argparse
-import os
+from histogram import *
 
 from continent import countryToContient
 from graph import Graph
-from plot import plot
+from data_analyzer import DataAnalyzer
 
 
-def readFile(path):
+def readFile(path) -> str:
+    """
+
+    :rtype: list
+    :param path: The path of the file
+    :return: A list of each line of the file
+    """
     array = []
     with open(path) as fp:
         line = fp.readline()
 
+        # While line is valid do
         while line:
             j = json.loads(line)
             j["continent"] = countryToContient(j["visitor_country"])
+
+            # Here, a regex has been used to get the browser
             j["browser"] = j["visitor_useragent"].split("/")[0]
             s = re.sub(r'\(.*?\)', '', j["visitor_useragent"])
             splited = s.split(' ')
             if len(splited) > 5 and len(splited[5].split('/')) > 1:
                 j["browser"] = splited[5].split('/')[0]
+            # Add the line to the array
             array.append(j)
             line = fp.readline()
 
@@ -35,22 +45,9 @@ pd.set_option('display.max_rows', None)
 pd.set_option('display.max_colwidth', -1)
 pd.set_option('display.expand_frame_repr', False)
 
-#lines = readFile("sample_100k_lines.json")
-#df = pd.DataFrame.from_dict(lines)
-#k = df.subject_doc_id.unique()
-
-
-# for z in k:
-# print(z)
-#    if len(plot(df).getViewersOfDocument(z)) > 1:
-#        print(z)
-#        print(len(plot(df).getViewersOfDocument(z)))
-
-# print(plot(df).topTenDocumentsSeen("140228101942-d4c9bd33cc299cc53d584ca1a4bf15d9", "2f63e0cca690da91"))
-
 
 def main():
-
+    # Argument parser
     parser = argparse.ArgumentParser(description="Issuu CW2")
     parser.add_argument("-f", "--file", help="JSON file with data", required=True)
     parser.add_argument("-u", "--uuid", help="User uuid")
@@ -61,26 +58,30 @@ def main():
     task = args.task
     lines = readFile(args.file)
     df = pd.DataFrame.from_dict(lines)
-    p = plot(df)
+
+    # This object handle the data and the visualisation for MathP
+    p = DataAnalyzer(df)
 
     if task == "2a":
-        if args.uuid is None:
+        if args.document is None:
             print("Missing uuid argument")
             exit(1)
 
         # Show the graph of countries using matplotlib
-        p.showCountries(args.uuid)
+        showCountries(p.getCountries(args.document))
     elif task == "2b":
-        if args.uuid is None:
+        if args.document is None:
             print("Missing uuid argument")
             exit(1)
         # Show the graph of continents using matplotlib
-        p.showContinent(args.uuid)
+        showContinent(p.getContinents(args.document))
 
     elif task == "3a":
-        p.viewPerUserAgent()
+        # Show the graph of all the users agents
+        showUserAgents(p.getUserAgents())
     elif task == "3b":
-        p.viewPerBrowser()
+        # Show the graph of views per browser
+        showBrowsers(p.getBrowsers())
     elif task == "4d":
         if args.document is None:
             print("Missing document argument")
@@ -95,10 +96,11 @@ def main():
             print("No documents has been found")
         else:
             print("Here the top 10 documents this user may like")
-            for i in range (len(list)):
+            for i in range(len(list)):
                 print("{0}: {1}".format(i + 1, list[i]))
 
     elif task == "5":
+        # Creation of a graphviz Graph by calling our object Graph
 
         if args.document is None:
             print("Missing document argument")
@@ -108,7 +110,7 @@ def main():
         else:
             Graph(p, uuid=args.uuid, document=args.document)
     elif task == "6":
-        p.viewPerBrowser()
+        print("Not implemented yet")
 
     else:
         print("Error: Task not in range [2a, 2b, 3a, 3b, 4d, 5, 6]")
