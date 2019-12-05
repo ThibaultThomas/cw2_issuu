@@ -1,92 +1,70 @@
 #!/usr/bin/python
 
-import pandas as pd
-import json
-import re
 import argparse
-from histogram import *
 
-from continent import countryToContient
-from graph import Graph
 from data_analyzer import DataAnalyzer
-
-
-def readFile(path) -> str:
-    """
-
-    :rtype: list
-    :param path: The path of the file
-    :return: A list of each line of the file
-    """
-    array = []
-    with open(path) as fp:
-        line = fp.readline()
-
-        # While line is valid do
-        while line:
-            j = json.loads(line)
-            j["continent"] = countryToContient(j["visitor_country"])
-
-            # Here, a regex has been used to get the browser
-            j["browser"] = j["visitor_useragent"].split("/")[0]
-            s = re.sub(r'\(.*?\)', '', j["visitor_useragent"])
-            splited = s.split(' ')
-            if len(splited) > 5 and len(splited[5].split('/')) > 1:
-                j["browser"] = splited[5].split('/')[0]
-            # Add the line to the array
-            array.append(j)
-            line = fp.readline()
-
-    return array
-
-
-pd.set_option('display.max_columns', None)
-pd.set_option('display.max_rows', None)
-pd.set_option('display.max_colwidth', -1)
-pd.set_option('display.expand_frame_repr', False)
+from graph import Graph
+from histogram import *
 
 
 def main():
     # Argument parser
-    parser = argparse.ArgumentParser(description="Issuu CW2")
-    parser.add_argument("-f", "--file", help="JSON file with data", required=True)
-    parser.add_argument("-u", "--uuid", help="User uuid")
-    parser.add_argument("-d", "--document", help="The document id")
-    parser.add_argument("-t", "--task", help="The task of the coursework", required=True)
+    parser = argparse.ArgumentParser(description="Issuu CW2 data analyzer")
+    parser.add_argument("-f", "--file", help="The file path with json data")
+    parser.add_argument("-u", "--uuid", help="User uuid to select")
+    parser.add_argument("-d", "--document", help="The document UUID to select")
+    parser.add_argument("-t", "--task", help="The task of the coursework [2a, 2b, 3a, 3b, 4d, 5, 6]", required=True)
     args = parser.parse_args()
 
     task = args.task
-    lines = readFile(args.file)
-    df = pd.DataFrame.from_dict(lines)
 
-    # This object handle the data and the visualisation for MathP
-    p = DataAnalyzer(df)
+    # This object handle the data from Pandas
+    p = None
+    if args.file is not None:
+        p = DataAnalyzer(args.file)
 
     if task == "2a":
         if args.document is None:
             print("Missing uuid argument")
             exit(1)
+        if args.file is None:
+            print("Missing file argument")
+            exit(1)
 
         # Show the graph of countries using matplotlib
         showCountries(p.getCountries(args.document))
+
     elif task == "2b":
         if args.document is None:
             print("Missing uuid argument")
+            exit(1)
+        if args.file is None:
+            print("Missing file argument")
             exit(1)
         # Show the graph of continents using matplotlib
         showContinent(p.getContinents(args.document))
 
     elif task == "3a":
         # Show the graph of all the users agents
+        if args.file is None:
+            print("Missing file argument")
+            exit(1)
         showUserAgents(p.getUserAgents())
+
     elif task == "3b":
         # Show the graph of views per browser
+        if args.file is None:
+            print("Missing file argument")
+            exit(1)
         showBrowsers(p.getBrowsers())
+
     elif task == "4d":
         if args.document is None:
             print("Missing document argument")
             exit(1)
-
+        if args.file is None:
+            print("Missing file argument")
+            exit(1)
         # Getting the top 10 files that this user may likes
         # The uuid remove the user from the list
         list = p.topTenDocumentsSeen(args.document, args.uuid)
@@ -105,10 +83,15 @@ def main():
         if args.document is None:
             print("Missing document argument")
             exit(1)
+        if args.file is None:
+            print("Missing file argument")
+            exit(1)
+
         if args.uuid is None:
             Graph(p, uuid=None, document=args.document)
         else:
             Graph(p, uuid=args.uuid, document=args.document)
+
     elif task == "6":
         print("Not implemented yet")
 

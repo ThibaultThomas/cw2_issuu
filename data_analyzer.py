@@ -1,15 +1,21 @@
-from pandas import DataFrame
+import json
+import re
+
+import pandas as pd
+
+from continent import countryToContient
 
 
 class DataAnalyzer:
 
-    def __init__(self, dataframe: DataFrame) -> None:
+    def __init__(self, path: str) -> None:
         """
         Create a DataAnalyzer object
 
-        :param dataframe: The pandas dataframe to use
+        :param path: The path
         """
-        self.dataframe = dataframe
+        lines = self.readFile(path)
+        self.dataframe = pd.DataFrame.from_dict(lines)
 
     def getCountries(self, docid: str) -> list:
         """
@@ -129,3 +135,31 @@ class DataAnalyzer:
                         mp[doc] = []
                         mp[doc].append(u)
         return mp
+
+    def readFile(self, path) -> list:
+        """
+
+        :rtype: list
+        :param path: The path of the file
+        :return: A list of each line of the file
+        """
+        array = []
+        with open(path) as fp:
+            line = fp.readline()
+
+            # While line is valid do
+            while line:
+                j = json.loads(line)
+                j["continent"] = countryToContient(j["visitor_country"])
+
+                # Here, a regex has been used to get the browser
+                j["browser"] = j["visitor_useragent"].split("/")[0]
+                s = re.sub(r'\(.*?\)', '', j["visitor_useragent"])
+                splited = s.split(' ')
+                if len(splited) > 5 and len(splited[5].split('/')) > 1:
+                    j["browser"] = splited[5].split('/')[0]
+                # Add the line to the array
+                array.append(j)
+                line = fp.readline()
+
+        return array
